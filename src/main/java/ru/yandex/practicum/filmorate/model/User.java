@@ -14,18 +14,18 @@ import java.time.LocalDate;
 @NoArgsConstructor
 @Data
 public class User {
-    int id;
+    private int id;
 
     @Email(message = "Неправильно указана почта")
-    String email;
+    private String email;
 
     @NotNull()
     @Pattern(regexp = "\\S+", message = "В логине не должно быть пробелов")
-    String login;
+    private String login;
 
-    String name;
+    private String name;
 
     @NotNull(message = "Дата рождения не должна быть пустой")
     @Past(message = "Дата рождения должна быть в прошлом")
-    LocalDate birthday;
+    private LocalDate birthday;
 }

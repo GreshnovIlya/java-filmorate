@@ -11,18 +11,18 @@ import java.time.LocalDate;
 @NoArgsConstructor
 @Data
 public class Film {
-    int id;
+    private int id;
 
     @NotBlank(message = "Неправильно указано название фильма")
     @NotNull
-    String name;
+    private String name;
 
     @Size(max = 200, message = "Максимальный размер описания фильма 200 символов")
-    String description;
+    private String description;
 
     @Past(message = "Дата релиза фильма должна быть в прошлом")
-    LocalDate releaseDate;
+    private LocalDate releaseDate;
 
     @Positive
-    int duration;
+    private int duration;
 }
