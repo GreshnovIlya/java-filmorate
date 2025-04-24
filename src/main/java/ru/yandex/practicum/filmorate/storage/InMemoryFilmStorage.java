@@ -49,6 +49,7 @@ public class InMemoryFilmStorage implements FilmStorage {
         if (!String.valueOf(updateFilm.getReleaseDate()).isEmpty()) {
             releaseDateBefore1895(updateFilm.getReleaseDate());
         }
+        updateFilm.setLikes(new HashSet<>());
         films.replace(updateFilm.getId(),updateFilm);
         log.info("Обновлен фильм {}", films.get(updateFilm.getId()).getName());
         return updateFilm;

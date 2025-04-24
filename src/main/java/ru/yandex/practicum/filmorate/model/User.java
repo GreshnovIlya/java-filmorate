@@ -28,7 +28,7 @@ public class User {
     @Past(message = "Дата рождения должна быть в прошлом")
     private LocalDate birthday;
 
-    private Set<Integer> friend;
+    private Set<Integer> friends;
 
     public User(int id, String email, String login, String name, LocalDate birthday) {
         this.id = id;

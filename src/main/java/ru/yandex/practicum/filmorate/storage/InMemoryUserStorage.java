@@ -28,11 +28,9 @@ public class InMemoryUserStorage implements UserStorage {
     @Override
     public User createUser(User user) {
         log.info("Получен HTTP запрос на добавление пользователя {}", user.getName());
-        if (user.getName() == null) {
-            user.setName(user.getLogin());
-        }
+        setNameAsLogin(user);
         user.setId(getNextId());
-        user.setFriend(new HashSet<>());
+        user.setFriends(new HashSet<>());
         users.put(user.getId(), user);
         log.info("Добавлен пользователь {}", user.getName());
         return user;
@@ -46,9 +44,8 @@ public class InMemoryUserStorage implements UserStorage {
         }
         notFoundUser(updateUser.getId());
         log.info("Получен HTTP запрос на обновление пользователя {}", users.get(updateUser.getId()).getName());
-        if (updateUser.getName() == null) {
-            updateUser.setName(updateUser.getLogin());
-        }
+        setNameAsLogin(updateUser);
+        updateUser.setFriends(new HashSet<>());
         users.replace(updateUser.getId(),updateUser);
         log.info("Обновлен пользователь {}", users.get(updateUser.getId()).getName());
         return updateUser;
@@ -67,6 +64,13 @@ public class InMemoryUserStorage implements UserStorage {
             log.error("Пользователь с id = {} не найден", id);
             throw new NotFoundException("Пользователь с id = " + id + " не найден");
         }
+    }
+
+    private User setNameAsLogin(User user) {
+        if (user.getName() == null) {
+            user.setName(user.getLogin());
+        }
+        return user;
     }
 
     private int getNextId() {
