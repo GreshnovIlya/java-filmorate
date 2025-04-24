@@ -30,7 +30,7 @@ public class InMemoryFilmStorage implements FilmStorage {
     @Override
     public Film createFilm(Film film) {
         log.info("Получен HTTP запрос на добавление фильма {}", film.getName());
-        ReleaseDateBefore1895(film.getReleaseDate());
+        releaseDateBefore1895(film.getReleaseDate());
         film.setId(getNextId());
         film.setLikes(new HashSet<>());
         films.put(film.getId(), film);
@@ -47,7 +47,7 @@ public class InMemoryFilmStorage implements FilmStorage {
         notFoundFilm(updateFilm.getId());
         log.info("Получен HTTP запрос на обновление фильма {}", films.get(updateFilm.getId()).getName());
         if (!String.valueOf(updateFilm.getReleaseDate()).isEmpty()) {
-            ReleaseDateBefore1895(updateFilm.getReleaseDate());
+            releaseDateBefore1895(updateFilm.getReleaseDate());
         }
         films.replace(updateFilm.getId(),updateFilm);
         log.info("Обновлен фильм {}", films.get(updateFilm.getId()).getName());
@@ -69,7 +69,7 @@ public class InMemoryFilmStorage implements FilmStorage {
         }
     }
 
-    private void ReleaseDateBefore1895(LocalDate releaseDate) {
+    private void releaseDateBefore1895(LocalDate releaseDate) {
         if (releaseDate.isBefore(LocalDate.parse("1895-12-28"))) {
             log.error("Неправильно указана дата релиза фильма");
             throw new ValidationException("Неправильно указана дата релиза");
