@@ -1,61 +1,76 @@
 package ru.yandex.practicum.filmorate.controller;
 
 import jakarta.validation.Valid;
-import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.validation.Errors;
 import org.springframework.web.bind.annotation.*;
 import ru.yandex.practicum.filmorate.exception.ValidationException;
 import ru.yandex.practicum.filmorate.model.User;
-
+import ru.yandex.practicum.filmorate.service.UserService;
+import ru.yandex.practicum.filmorate.storage.UserStorage;
 import java.util.*;
 
-@Slf4j
 @RestController
 @RequestMapping("/users")
 public class UserController {
-    private final Map<Integer, User> users = new HashMap<>();
+    private final UserStorage inMemoryUserStorage;
+    private final UserService userService;
+
+    public UserController(@Autowired UserStorage inMemoryUserStorage, UserService userService) {
+        this.inMemoryUserStorage = inMemoryUserStorage;
+        this.userService = userService;
+    }
 
     @GetMapping
-    public List<User> findAll() {
-        return new ArrayList<>(users.values());
+    public List<User> findAllUser() {
+        return inMemoryUserStorage.findAllUser();
+    }
+
+    @GetMapping("/{id}")
+    public User findUserById(@PathVariable int id) {
+        return inMemoryUserStorage.findUserById(id);
     }
 
     @PostMapping
-    public User create(@Valid @RequestBody User user) {
-        log.info("Получен HTTP запрос на добавление пользователя {}", user.getName());
-        if (user.getName() == null) {
-            user.setName(user.getLogin());
-        }
-        user.setId(getNextId());
-        users.put(user.getId(), user);
-        log.info("Добавлен пользователь {}", user.getName());
-        return user;
+    public User createUser(@Valid @RequestBody User user, Errors errors) {
+        findError(errors);
+        return inMemoryUserStorage.createUser(user);
     }
 
     @PutMapping
-    public User update(@Valid @RequestBody User updateUser) {
-        if (String.valueOf(updateUser.getId()).equals("null")) {
-            log.error("Id должен быть указан");
-            throw new ValidationException("Id должен быть указан");
-        }
-        if (users.containsKey(updateUser.getId())) {
-            log.info("Получен HTTP запрос на обновление пользователя {}", users.get(updateUser.getId()).getName());
-            if (updateUser.getName() == null) {
-                updateUser.setName(updateUser.getLogin());
-            }
-            log.info("Обновлен пользователь {}", users.get(updateUser.getId()).getName());
-            return updateUser;
-        }
-        log.error("Пользователь с id = {} не найден", updateUser.getId());
-        throw new ValidationException("Пользователь с id = " + updateUser.getId() + " не найден");
+    public User updateUser(@Valid @RequestBody User updateUser, Errors errors) {
+        findError(errors);
+        return inMemoryUserStorage.updateUser(updateUser);
     }
 
-    // вспомогательный метод для генерации идентификатора нового поста
-    private int getNextId() {
-        int currentMaxId = users.keySet()
-                .stream()
-                .mapToInt(id -> id)
-                .max()
-                .orElse(0);
-        return ++currentMaxId;
+    @DeleteMapping("/{idUser}")
+    public User deleteUser(@PathVariable int idUser) {
+        return inMemoryUserStorage.deleteUser(idUser);
+    }
+
+    @PutMapping("/{id}/friends/{friendId}")
+    public User addFriend(@PathVariable int id, @PathVariable int friendId) {
+        return userService.addFriend(id, friendId);
+    }
+
+    @DeleteMapping("/{id}/friends/{friendId}")
+    public User deleteFriend(@PathVariable int id, @PathVariable int friendId) {
+        return userService.deleteFriend(id, friendId);
+    }
+
+    @GetMapping("/{id}/friends")
+    public List<User> getFriends(@PathVariable int id) {
+        return userService.getFriends(id);
+    }
+
+    @GetMapping("/{id}/friends/common/{otherId}")
+    public List<User> getCommonFriends(@PathVariable int id, @PathVariable int otherId) {
+        return userService.getCommonFriends(id, otherId);
+    }
+
+    private void findError(Errors errors) {
+        if (errors.hasErrors()) {
+            throw new ValidationException(errors.getAllErrors().getFirst().getDefaultMessage());
+        }
     }
 }
