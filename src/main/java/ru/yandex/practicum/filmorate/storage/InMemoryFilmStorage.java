@@ -23,14 +23,20 @@ public class InMemoryFilmStorage implements FilmStorage {
     @Override
     public Film findFilmById(int id) {
         log.info("Получен HTTP запрос на получение фильма с id = {}", id);
-        notFoundFilm(id);
+        if (!films.containsKey(id)) {
+            log.error("Фильм с id = {} не найден", id);
+            throw new NotFoundException("Фильм с id = " + id + " не найден");
+        }
         return films.get(id);
     }
 
     @Override
     public Film createFilm(Film film) {
         log.info("Получен HTTP запрос на добавление фильма {}", film.getName());
-        releaseDateBefore1895(film.getReleaseDate());
+        if (film.getReleaseDate().isBefore(LocalDate.parse("1895-12-28"))) {
+            log.error("При добавлении фильма неправильно указана дата релиза");
+            throw new ValidationException("При добавлении фильма неправильно указана дата релиза");
+        }
         film.setId(getNextId());
         film.setLikes(new HashSet<>());
         films.put(film.getId(), film);
@@ -41,15 +47,21 @@ public class InMemoryFilmStorage implements FilmStorage {
     @Override
     public Film updateFilm(Film updateFilm) {
         if (String.valueOf(updateFilm.getId()).equals("null")) {
-            log.error("Id должен быть указан");
-            throw new ValidationException("Id должен быть указан");
+            log.error("При обновлении фильма id должен быть указан");
+            throw new ValidationException("При обновлении фильма id должен быть указан");
         }
-        notFoundFilm(updateFilm.getId());
+        if (!films.containsKey(updateFilm.getId())) {
+            log.error("При обновлении фильм с id = {} не найден", updateFilm.getId());
+            throw new NotFoundException("При обновлении фильм с id = " + updateFilm.getId() + " не найден");
+        }
         log.info("Получен HTTP запрос на обновление фильма {}", films.get(updateFilm.getId()).getName());
         if (!String.valueOf(updateFilm.getReleaseDate()).isEmpty()) {
-            releaseDateBefore1895(updateFilm.getReleaseDate());
+            if (updateFilm.getReleaseDate().isBefore(LocalDate.parse("1895-12-28"))) {
+                log.error("При обновлении фильма неправильно указана дата релиза");
+                throw new ValidationException("При обновлении фильма неправильно указана дата релиза");
+            }
         }
-        updateFilm.setLikes(new HashSet<>());
+        updateFilm.setLikes(films.get(updateFilm.getId()).getLikes());
         films.replace(updateFilm.getId(),updateFilm);
         log.info("Обновлен фильм {}", films.get(updateFilm.getId()).getName());
         return updateFilm;
@@ -58,23 +70,9 @@ public class InMemoryFilmStorage implements FilmStorage {
     @Override
     public Film deleteFilm(int idFilm) {
         if (!films.containsKey(idFilm)) {
-            throw new ValidationException("Нет фильма с id = " + idFilm);
+            throw new ValidationException("При попытке удаления не найден фильм с id = " + idFilm);
         }
         return films.remove(idFilm);
-    }
-
-    private void notFoundFilm(int id) {
-        if (!films.containsKey(id)) {
-            log.error("Фильм с id = {} не найден", id);
-            throw new NotFoundException("Фильм с id = " + id + " не найден");
-        }
-    }
-
-    private void releaseDateBefore1895(LocalDate releaseDate) {
-        if (releaseDate.isBefore(LocalDate.parse("1895-12-28"))) {
-            log.error("Неправильно указана дата релиза фильма");
-            throw new ValidationException("Неправильно указана дата релиза");
-        }
     }
 
     private int getNextId() {
