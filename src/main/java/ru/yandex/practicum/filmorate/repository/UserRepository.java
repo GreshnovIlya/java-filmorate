@@ -137,7 +137,8 @@ public class UserRepository {
                         .prepareStatement(ADD_FRIEND_REQUEST, Statement.RETURN_GENERATED_KEYS);
                 ps.setObject(1, idUser);
                 ps.setObject(2, friendId);
-                return ps;}, keyHolder);
+                return ps;
+                }, keyHolder);
 
             Integer idFriendship = keyHolder.getKeyAs(Integer.class);
 
