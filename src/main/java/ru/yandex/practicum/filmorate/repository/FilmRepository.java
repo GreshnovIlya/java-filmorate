@@ -45,7 +45,7 @@ public class FilmRepository {
             "ORDER BY likes DESC LIMIT ?) as t INNER JOIN films as f ON f.id = t.id_film LEFT JOIN (SELECT id_film, " +
             "array_agg(id_genre) as genres FROM film_genre GROUP BY id_film) as g ON g.id_film = f.id;";
 
-    public List<Film> findAllFilm () {
+    public List<Film> findAllFilm() {
         return jdbc.query(FIND_ALL_FILMS, filmMapper);
     }
 
@@ -70,7 +70,8 @@ public class FilmRepository {
             ps.setObject(3, film.getReleaseDate());
             ps.setObject(4, film.getDuration());
             ps.setObject(5, film.getMpa().getId());
-            return ps;}, keyHolder);
+            return ps;
+            }, keyHolder);
 
         Integer id = keyHolder.getKeyAs(Integer.class);
 
@@ -129,7 +130,8 @@ public class FilmRepository {
                         .prepareStatement(INSERT_FILM_GENRE, Statement.RETURN_GENERATED_KEYS);
                 ps.setObject(1, film.getId());
                 ps.setObject(2, i.getId());
-                return ps;}, keyHolderGenre);
+                return ps;
+                }, keyHolderGenre);
 
             Integer idGenre = keyHolderGenre.getKeyAs(Integer.class);
 
@@ -153,7 +155,8 @@ public class FilmRepository {
                     .prepareStatement(LIKE_FILM, Statement.RETURN_GENERATED_KEYS);
             ps.setObject(1, idFilm);
             ps.setObject(2, userId);
-            return ps;}, keyHolder);
+            return ps;
+            }, keyHolder);
 
         Integer id = keyHolder.getKeyAs(Integer.class);
 
