@@ -11,7 +11,6 @@ import ru.yandex.practicum.filmorate.exception.ValidationException;
 import ru.yandex.practicum.filmorate.model.User;
 import ru.yandex.practicum.filmorate.repository.mapper.FriendshipMapper;
 import ru.yandex.practicum.filmorate.repository.mapper.UserMapper;
-
 import java.sql.PreparedStatement;
 import java.sql.Statement;
 import java.util.List;
