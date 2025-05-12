@@ -1,42 +1,28 @@
 package ru.yandex.practicum.filmorate.controller;
 
 import lombok.RequiredArgsConstructor;
-import org.springframework.dao.EmptyResultDataAccessException;
-import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
-import ru.yandex.practicum.filmorate.exception.NotFoundException;
 import ru.yandex.practicum.filmorate.model.Mpa;
-import ru.yandex.practicum.filmorate.repository.mapper.MpaMapper;
+import ru.yandex.practicum.filmorate.repository.MpaRepository;
 
 import java.util.List;
-import java.util.Optional;
 
 @RestController
 @RequestMapping("/mpa")
 @RequiredArgsConstructor
 public class MpaController {
-    protected final JdbcTemplate jdbc;
-    protected final MpaMapper mpaMapper;
-
-    private static final String FIND_ALL_RATINGS = "SELECT * FROM mpa";
-    private static final String FIND_RATING_BY_ID = "SELECT * FROM mpa WHERE id = ?";
+    protected final MpaRepository mpaRepository;
 
     @GetMapping
     public List<Mpa> findAllMpa() {
-        return jdbc.query(FIND_ALL_RATINGS, mpaMapper);
+        return mpaRepository.findAllMpa();
     }
 
     @GetMapping("/{id}")
     public Mpa findMpaById(@PathVariable int id) {
-        try {
-            Optional.ofNullable(jdbc.queryForObject("SELECT * FROM mpa WHERE id = ?", mpaMapper, id))
-                    .orElseThrow(() -> new NotFoundException("Такого id рейтинга не существует"));
-        } catch (EmptyResultDataAccessException ignored) {
-            throw new NotFoundException("Такого id рейтинга не существует");
-        }
-        return jdbc.queryForObject(FIND_RATING_BY_ID, mpaMapper, id);
+        return mpaRepository.findMpaById(id);
     }
 }
