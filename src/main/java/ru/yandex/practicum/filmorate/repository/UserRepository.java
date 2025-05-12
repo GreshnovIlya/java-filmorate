@@ -47,7 +47,7 @@ public class UserRepository {
             "FROM user_friendship WHERE id_user = ? UNION SELECT id_user FROM user_friendship " +
             "WHERE id_friend  = ? AND friendship = TRUE) as k ON t.id_friend = k.id_friend);";
 
-    public List<User> findAllUsers () {
+    public List<User> findAllUsers() {
         return jdbc.query(FIND_ALL_USERS, userMapper);
     }
 
@@ -69,7 +69,8 @@ public class UserRepository {
             ps.setObject(2, user.getLogin());
             ps.setObject(3, user.getName());
             ps.setObject(4, user.getBirthday());
-            return ps;}, keyHolder);
+            return ps;
+            }, keyHolder);
 
         Integer id = keyHolder.getKeyAs(Integer.class);
 
@@ -126,7 +127,9 @@ public class UserRepository {
                         throw new InternalServerException("Не удалось обновить данные");
                     }
                 }
-            } catch (EmptyResultDataAccessException ignored) {}
+            } catch (EmptyResultDataAccessException ignored) {
+
+            }
         } else {
             GeneratedKeyHolder keyHolder = new GeneratedKeyHolder();
             jdbc.update(connection -> {
@@ -156,7 +159,9 @@ public class UserRepository {
                     throw new InternalServerException("Не удалось обновить данные");
                 }
             }
-        } catch (EmptyResultDataAccessException ignored) {}
+        } catch (EmptyResultDataAccessException ignored) {
+
+        }
         try {
             if (Objects.requireNonNull(jdbc.queryForObject(CHECK_FRIENDSHIP, friendshipMapper, idUser,
                     friendId)).isFriendship()) {
@@ -165,7 +170,9 @@ public class UserRepository {
                     throw new InternalServerException("Не удалось обновить данные");
                 }
             }
-        } catch (EmptyResultDataAccessException ignored) {}
+        } catch (EmptyResultDataAccessException ignored) {
+
+        }
         try {
             if (Objects.requireNonNull(jdbc.queryForObject(CHECK_FRIENDSHIP, friendshipMapper, friendId,
                     idUser)).isFriendship()) {
@@ -174,7 +181,9 @@ public class UserRepository {
                     throw new InternalServerException("Не удалось обновить данные");
                 }
             }
-        } catch (EmptyResultDataAccessException ignored) {}
+        } catch (EmptyResultDataAccessException ignored) {
+
+        }
         return findUserById(idUser);
     }
 
