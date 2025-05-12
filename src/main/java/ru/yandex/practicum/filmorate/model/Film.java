@@ -5,15 +5,13 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 
 import java.time.LocalDate;
-import java.util.Set;
+import java.util.List;
 
 @NoArgsConstructor
 @Data
 public class Film {
     private int id;
 
-    @NotBlank(message = "Неправильно указано название фильма")
-    @NotNull
     private String name;
 
     @Size(max = 200, message = "Максимальный размер описания фильма 200 символов")
@@ -22,16 +20,20 @@ public class Film {
     @Past(message = "Дата релиза фильма должна быть в прошлом")
     private LocalDate releaseDate;
 
-    @Positive
     private int duration;
 
-    private Set<Integer> likes;
+    private Mpa mpa;
 
-    public Film(int id, String name, String description, LocalDate releaseDate, int duration) {
+    private List<Genre> genres;
+
+    public Film(int id, String name, String description, LocalDate releaseDate, int duration, Mpa mpa,
+                List<Genre> genres) {
         this.id = id;
         this.name = name;
         this.description = description;
         this.releaseDate = releaseDate;
         this.duration = duration;
+        this.mpa = mpa;
+        this.genres = genres;
     }
 }

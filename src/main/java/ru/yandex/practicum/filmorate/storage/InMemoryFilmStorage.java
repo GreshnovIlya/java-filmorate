@@ -38,7 +38,6 @@ public class InMemoryFilmStorage implements FilmStorage {
             throw new ValidationException("При добавлении фильма неправильно указана дата релиза");
         }
         film.setId(getNextId());
-        film.setLikes(new HashSet<>());
         films.put(film.getId(), film);
         log.info("Добавлен фильм {}", film.getName());
         return film;
@@ -61,18 +60,32 @@ public class InMemoryFilmStorage implements FilmStorage {
                 throw new ValidationException("При обновлении фильма неправильно указана дата релиза");
             }
         }
-        updateFilm.setLikes(films.get(updateFilm.getId()).getLikes());
         films.replace(updateFilm.getId(),updateFilm);
         log.info("Обновлен фильм {}", films.get(updateFilm.getId()).getName());
         return updateFilm;
     }
 
     @Override
-    public Film deleteFilm(int idFilm) {
+    public boolean deleteFilm(int idFilm) {
         if (!films.containsKey(idFilm)) {
             throw new ValidationException("При попытке удаления не найден фильм с id = " + idFilm);
         }
-        return films.remove(idFilm);
+        return true;
+    }
+
+    @Override
+    public boolean likeFilm(int id, int userId) {
+        return true;
+    }
+
+    @Override
+    public boolean deleteLikeFilm(int id, int userId) {
+        return true;
+    }
+
+    @Override
+    public List<Film> getPopularFilms(int count) {
+        return List.of();
     }
 
     private int getNextId() {
