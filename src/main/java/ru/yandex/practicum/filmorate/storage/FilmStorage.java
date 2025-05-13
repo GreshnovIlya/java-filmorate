@@ -12,5 +12,11 @@ public interface FilmStorage {
 
     public Film updateFilm(Film updateFilm);
 
-    public Film deleteFilm(int idFilm);
+    public boolean deleteFilm(int idFilm);
+
+    public boolean likeFilm(int id, int userId);
+
+    public boolean deleteLikeFilm(int id, int userId);
+
+    public List<Film> getPopularFilms(int count);
 }
